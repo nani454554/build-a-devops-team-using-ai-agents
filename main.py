@@ -25,7 +25,6 @@ def main():
     gha_agent = GitHubActionsAgent(config=gha_config)
     pipeline = gha_agent.generate_pipeline()
 
-    # Save the pipeline configuration to a YAML file
     with open(".github/workflows/CI3.yml", "w", encoding="utf-8") as f:
         f.write(pipeline)
     print("✅ CI/CD Pipeline created!")
@@ -52,8 +51,16 @@ def main():
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     version_tag = f"v1-{timestamp}"
+
     dockerhub_user = os.getenv("DOCKERHUB_USERNAME")
     dockerhub_pass = os.getenv("DOCKERHUB_PASSWORD")
+
+    # Check if credentials are present
+    if not dockerhub_user or not dockerhub_pass:
+        print("❌ Error: DockerHub credentials are not set in environment variables.")
+        print("➡️ Please set DOCKERHUB_USERNAME and DOCKERHUB_PASSWORD in GitHub Secrets.")
+        exit(1)
+
     full_image_tag = f"{dockerhub_user}/myapp:{version_tag}"
 
     status_config = BuildStatusConfig(image_tag=full_image_tag)
