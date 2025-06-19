@@ -7,7 +7,7 @@ import datetime
 import subprocess
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables from .env file and GitHub Actions
 load_dotenv()
 
 def main():
@@ -48,44 +48,55 @@ def main():
     print("✅ Dockerfile created!")
 
     # 3. Build and Push Docker Image
-    print("\n3️⃣ Build Status Agent: Building and checking Docker image...")
+    print("\n3️⃣ Build Status Agent: Building and pushing Docker image...")
 
-    # Generate dynamic version tag
     timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     version_tag = f"v1-{timestamp}"
-    dockerhub_user = "nani4545"  # Replace this with your username
+    dockerhub_user = os.getenv("DOCKERHUB_USERNAME")
+    dockerhub_pass = os.getenv("DOCKERHUB_PASSWORD")
     full_image_tag = f"{dockerhub_user}/myapp:{version_tag}"
 
     status_config = BuildStatusConfig(image_tag=full_image_tag)
     status_agent = BuildStatusAgent(config=status_config)
 
+    # Docker login
+    print("🔐 Logging in to Docker Hub...")
+    login_result = subprocess.run(
+        ["docker", "login", "--username", dockerhub_user, "--password-stdin"],
+        input=dockerhub_pass,
+        capture_output=True,
+        text=True
+    )
+    if login_result.returncode != 0:
+        print("❌ Docker login failed:")
+        print(login_result.stderr)
+        exit(1)
+    print("✅ Docker login successful.")
+
+    # Build Docker image
     print(f"🔨 Building Docker image: {full_image_tag}...")
     build_result = subprocess.run(
         ["docker", "build", "-t", full_image_tag, "."],
         capture_output=True,
         text=True
     )
-
     if build_result.returncode != 0:
         print("❌ Docker build failed:")
         print(build_result.stderr)
         exit(1)
+    print("✅ Docker image built successfully.")
 
-    print("✅ Docker image built successfully!")
-
-    # Push the image
-    print(f"📦 Pushing Docker image to registry: {full_image_tag}...")
+    # Push Docker image
+    print(f"📦 Pushing Docker image: {full_image_tag}...")
     push_result = subprocess.run(
         ["docker", "push", full_image_tag],
         capture_output=True,
         text=True
     )
-
     if push_result.returncode != 0:
         print("❌ Docker push failed:")
         print(push_result.stderr)
         exit(1)
-
     print("✅ Docker image pushed successfully!")
 
     # Check build status
