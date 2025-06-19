@@ -56,10 +56,10 @@ def main():
     dockerhub_pass = os.getenv("DOCKERHUB_PASSWORD")
 
     # Check if credentials are present
-    if not dockerhub_user or not dockerhub_pass:
-        print("❌ Error: DockerHub credentials are not set in environment variables.")
-        print("➡️ Please set DOCKERHUB_USERNAME and DOCKERHUB_PASSWORD in GitHub Secrets.")
-        exit(1)
+    # if not dockerhub_user or not dockerhub_pass:
+    #     print("❌ Error: DockerHub credentials are not set in environment variables.")
+    #     print("➡️ Please set DOCKERHUB_USERNAME and DOCKERHUB_PASSWORD in GitHub Secrets.")
+    #     exit(1)
 
     full_image_tag = f"{dockerhub_user}/myapp:{version_tag}"
 
