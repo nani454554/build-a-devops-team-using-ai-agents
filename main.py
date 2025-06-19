@@ -57,7 +57,7 @@ def main():
 
     # 3. Build and Check Status
     print("\n3️⃣ Build Status Agent: Building and checking Docker image...")
-    status_config = BuildStatusConfig(image_tag="myapp:latest")
+    status_config = BuildStatusConfig(image_tag="nani:latest")
     status_agent = BuildStatusAgent(config=status_config)
     
     # Attempt to build the Docker image
